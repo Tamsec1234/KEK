@@ -18,43 +18,43 @@ namespace ASAssignment
         string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["userDB"].ConnectionString;
         public class MyObject
         {
-            public string Successful { get; set; }
-            public List<String> ErrMsg { get; set; }
+            public string success { get; set; }
+            public List<String> ErrorMessage { get; set; }
         }
 
-        //public bool CaptchaValidation()
-        //{
-        //    bool result = true;
+        public bool CaptchaValidation()
+        {
+            bool result = true;
 
-        //    string captchaResponse = Request.Form["g-recaptcha-response"];
+            string captchaResponse = Request.Form["g-recaptcha-response"];
 
-        //    HttpWebRequest req = (HttpWebRequest)WebRequest.Create("https://www.google.com/recaptcha/api/siteverify?secret=6Le2zkMaAAAAAJM39m6XW8bVYAWUlyaW6ach-vkh &response=" + captchaResponse);
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("https://www.google.com/recaptcha/api/siteverify?secret=6LfTIkgaAAAAACo87RcpBEP0Z4cAxQbJIseowih0" +"&response=" + captchaResponse);
 
-        //    try
-        //    {
-        //        using (WebResponse Responses = req.GetResponse())
-        //        {
-        //            using (StreamReader streamRead = new StreamReader(Responses.GetResponseStream()))
-        //            {
-        //                string responseJson = streamRead.ReadToEnd();
+            try
+            {
+                using (WebResponse Responses = req.GetResponse())
+                {
+                    using (StreamReader streamRead = new StreamReader(Responses.GetResponseStream()))
+                    {
+                        string responseJson = streamRead.ReadToEnd();
 
-        //                lbl_gScore.Text = responseJson.ToString();
+                        lbl_gScore.Text = responseJson.ToString();
 
-        //                JavaScriptSerializer jss = new JavaScriptSerializer();
+                        JavaScriptSerializer jss = new JavaScriptSerializer();
 
-        //                MyObject jsonObject = jss.Deserialize<MyObject>(responseJson);
+                        MyObject jsonObject = jss.Deserialize<MyObject>(responseJson);
 
-        //                result = Convert.ToBoolean(jsonObject.Successful);
-        //            }
-        //        }
-        //        return result;
-        //    }
-        //    catch (WebException ex)
-        //    {
-        //        throw ex;
-        //    }
-            
-        //}
+                        result = Convert.ToBoolean(jsonObject.success);
+                    }
+                }
+                return result;
+            }
+            catch (WebException ex)
+            {
+                throw ex;
+            }
+
+        }
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request.QueryString["error"] == "error")
@@ -63,55 +63,55 @@ namespace ASAssignment
                 lblError.ForeColor = System.Drawing.Color.Red;
             }
         }
-        
+
 
         protected void btn_login_Click(object sender, EventArgs e)
         {
-            //if (CaptchaValidation())
-            //{
-            string pword = HttpUtility.HtmlEncode(tb_password.Text.ToString().Trim());
-            string email = HttpUtility.HtmlEncode(tb_email.Text.ToString().Trim());
-            SHA512Managed hashh = new SHA512Managed();
-            string dbh = getDBH(email);
-            string dbs = getDBS(email);
-            lbl_gScore.Text = dbh + "," + dbs;
-
-            Session["Error"] = "Email or password is invalid, try again";
-            try
+            if (CaptchaValidation())
             {
-                if (dbs != null && dbs.Length > 0 && dbh != null && dbh.Length >0)
+                string pword = HttpUtility.HtmlEncode(tb_password.Text.ToString().Trim());
+                string email = HttpUtility.HtmlEncode(tb_email.Text.ToString().Trim());
+                SHA512Managed hashh = new SHA512Managed();
+                string dbh = getDBH(email);
+                string dbs = getDBS(email);
+                lbl_gScore.Text = dbh + "," + dbs;
+
+                Session["Error"] = "Email or password is invalid, try again";
+                try
                 {
-                    string pwordWithSalt = pword + dbs;
-                    byte[] hashWithSalt = hashh.ComputeHash(Encoding.UTF8.GetBytes(pwordWithSalt));
-                    string emailHash = Convert.ToBase64String(hashWithSalt);
-
-                    if (emailHash.Equals(dbh))
+                    if (dbs != null && dbs.Length > 0 && dbh != null && dbh.Length > 0)
                     {
-                        Session["IsLoggedIn"] = tb_email.Text.Trim();
+                        string pwordWithSalt = pword + dbs;
+                        byte[] hashWithSalt = hashh.ComputeHash(Encoding.UTF8.GetBytes(pwordWithSalt));
+                        string emailHash = Convert.ToBase64String(hashWithSalt);
 
-                        string guid = Guid.NewGuid().ToString();
-                        Session["AuthenticationToken"] = guid;
+                        if (emailHash.Equals(dbh))
+                        {
+                            Session["IsLoggedIn"] = tb_email.Text.Trim();
 
-                        Response.Cookies.Add(new HttpCookie("AuthenticationToken", guid));
+                            string guid = Guid.NewGuid().ToString();
+                            Session["AuthenticationToken"] = guid;
 
-                        Response.Redirect("AfterLogin.aspx", false);
-                        
+                            Response.Cookies.Add(new HttpCookie("AuthenticationToken", guid));
 
-                    }
-                    else
-                    {
-                        Response.Redirect("Login.aspx?error=error", false);
+                            Response.Redirect("AfterLogin.aspx", false);
+
+
+                        }
+                        else
+                        {
+                            Response.Redirect("Login.aspx?error=error", false);
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+
+                    throw new Exception(ex.ToString());
+                }
+                finally { }
+
             }
-            catch (Exception ex)
-            {
-
-                throw new Exception(ex.ToString());
-            }
-            finally { }
-
-
         }
         protected string getDBH(string email)
         {

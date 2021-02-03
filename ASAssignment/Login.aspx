@@ -18,7 +18,7 @@
             margin-left: 293px;
         }
     </style>
-    <script src="https://www.google.com/recaptcha/api.js?render=6Le2zkMaAAAAALWOUCGX529_1_2CzUhEmJJmdlSt"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LfTIkgaAAAAAJ-jIRWCvlcGgjD_q6EQIK3_jaIv"></script>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -27,6 +27,7 @@
         <br />
         <br />
         <br />
+        <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" />
         <asp:Label ID="Label1" runat="server" Text="Email: "></asp:Label>
         <asp:TextBox ID="tb_email" runat="server" CssClass="auto-style1"></asp:TextBox>
         <br />
@@ -36,14 +37,14 @@
         <br />
         <br />
         <asp:Button ID="btn_login" runat="server" CssClass="auto-style3" Text="Login" OnClick="btn_login_Click" />
-        <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" />
+        
         <br />
         <asp:Label ID="lblError" runat="server"></asp:Label>
         <asp:Label ID="lbl_gScore" runat="server"></asp:Label>
     </form>
     <script>
         grecaptcha.ready(function () {
-            grecaptcha.execute('6Le2zkMaAAAAALWOUCGX529_1_2CzUhEmJJmdlSt', { action: 'Login' }).then(function (token) {
+            grecaptcha.execute('6LfTIkgaAAAAAJ-jIRWCvlcGgjD_q6EQIK3_jaIv', { action: 'Login' }).then(function (token) {
                 document.getElementById("g-recaptcha-response").value = token;
             });
         });
